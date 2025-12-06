@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - DGR WATER SUPPLY BOARD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; font-family:system-ui,sans-serif; }
+    body {
+      min-height:100vh;
+      background:radial-gradient(circle at top,#020617,#020617);
+      color:#e5e7eb;
+      padding:1rem;
+    }
+    header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:0.8rem 1rem 1rem;
+    }
+    h1 { font-size:1.3rem; }
+    .nav-buttons {
+      display:flex; gap:0.5rem; flex-wrap:wrap;
+    }
+    .nav-btn {
+      border:none;
+      padding:0.5rem 0.9rem;
+      border-radius:999px;
+      font-size:0.85rem;
+      cursor:pointer;
+      background:#1f2937;
+      color:#e5e7eb;
+      border:1px solid #4b5563;
+    }
+    .nav-btn:hover { background:#111827; }
+    .grid { max-width:900px; margin:0 auto; display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+    .card {
+      background:rgba(15,23,42,0.96);
+      border-radius:16px;
+      padding:1rem;
+      border:1px solid rgba(148,163,184,0.35);
+      box-shadow:0 12px 30px rgba(0,0,0,0.6);
+    }
+    .label { font-size:0.85rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.3rem;}
+    .status { font-size:0.8rem; padding:0.2rem 0.7rem; border-radius:999px; background:rgba(148,163,184,0.25); }
+    .motor-container {
+      display:flex; align-items:center; gap:1rem; margin-top:0.7rem;
+    }
+    .motor-button {
+      width:70px; height:70px; border-radius:999px; border:none;
+      cursor:pointer; font-weight:700; font-size:0.9rem;
+      background:#ef4444; color:#fff;
+      box-shadow:0 14px 28px rgba(0,0,0,0.6);
+    }
+    .motor-button.on { background:#22c55e; }
+    .indicator {
+      width:24px; height:24px;
+      border-radius:4px;
+      background:#ef4444;
+      border:1px solid #4b5563;
+    }
+    .indicator.on { background:#22c55e; }
+    .info { font-size:0.8rem; color:#9ca3af; margin-top:0.4rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div style="font-size:0.8rem; color:#9ca3af; cursor:pointer;" onclick="location.href='login.html'">← Logout</div>
+      <h1>Admin Panel – DGR WATER SUPPLY BOARD</h1>
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="location.href='user1.html'">home1</button>
+      <button class="nav-btn" onclick="location.href='user2.html'">home2</button>
+      <button class="nav-btn" onclick="location.href='leakage.html'">leakage</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid">
+      <div class="card">
+        <div class="label">Motor Control</div>
+        <div id="motorStatus" class="status">Unknown</div>
+        <div class="motor-container">
+          <button id="motorButton" class="motor-button" onclick="toggleMotor()">OFF</button>
+          <div id="motorIndicator" class="indicator"></div>
+        </div>
+        <div class="info">Controls main pump via relay connected to ESP32.<br/>State is synced with backend.</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ===== EDIT THIS URL TO YOUR BACKEND / ESP32 GATEWAY =====
+    const API_BASE_URL = "https://your-esp32-or-backend-url.com";
+    // ========================================================
+
+    let motorOn = false;
+
+    async function loadMotorState() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/motor/status`);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        // Expect: { "state": "ON" } or { "state": "OFF" }
+        motorOn = (data.state === "ON");
+        updateMotorUI();
+      } catch (e) {
+        console.error(e);
+        document.getElementById("motorStatus").textContent = "Offline";
+      }
+    }
+
+    async function toggleMotor() {
+      try {
+        const newState = motorOn ? "OFF" : "ON";
+        const res = await fetch(`${API_BASE_URL}/motor/control`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ state: newState })
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        motorOn = (data.state === "ON");
+        updateMotorUI();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to send command");
+      }
+    }
+
+    function updateMotorUI() {
+      const btn = document.getElementById("motorButton");
+      const ind = document.getElementById("motorIndicator");
+      const status = document.getElementById("motorStatus");
+      if (motorOn) {
+        btn.textContent = "ON";
+        btn.classList.add("on");
+        ind.classList.add("on");
+        status.textContent = "Motor ON";
+      } else {
+        btn.textContent = "OFF";
+        btn.classList.remove("on");
+        ind.classList.remove("on");
+        status.textContent = "Motor OFF";
+      }
+    }
+
+    loadMotorState();
+  </script>
+</body>
+</html>
