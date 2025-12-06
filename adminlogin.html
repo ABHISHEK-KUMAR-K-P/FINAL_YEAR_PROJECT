@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login - DGR WATER SUPPLY BOARD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top,#111827,#020617);
+      display:flex; align-items:center; justify-content:center;
+      padding:1rem; color:#e5e7eb;
+    }
+    .card {
+      width:100%; max-width:380px;
+      background:rgba(15,23,42,0.96);
+      border-radius:18px;
+      padding:2rem;
+      box-shadow:0 18px 40px rgba(0,0,0,0.6);
+      border:1px solid rgba(148,163,184,0.3);
+    }
+    h2 { text-align:center; margin-bottom:0.4rem; }
+    p.subtitle { text-align:center; font-size:0.85rem; color:#9ca3af; margin-bottom:1.5rem; }
+    label { display:block; font-size:0.85rem; margin-bottom:0.3rem; color:#cbd5f5; }
+    input {
+      width:100%; padding:0.6rem 0.8rem; border-radius:10px;
+      border:1px solid #4b5563; background:#020617; color:#e5e7eb;
+      margin-bottom:1rem; outline:none; font-size:0.95rem;
+    }
+    input:focus { border-color:#f97316; box-shadow:0 0 0 1px rgba(249,115,22,0.4); }
+    .btn {
+      width:100%; padding:0.7rem 1rem; border-radius:999px;
+      border:none; background:linear-gradient(135deg,#f97316,#ea580c);
+      color:#fff; font-weight:600; cursor:pointer;
+      box-shadow:0 14px 28px rgba(234,88,12,0.5);
+    }
+    .btn:hover { opacity:0.96; transform:translateY(-1px); }
+    .error { display:none; font-size:0.8rem; color:#fecaca; margin-bottom:0.6rem; }
+    .back { margin-top:0.8rem; font-size:0.8rem; text-align:center; color:#9ca3af; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Admin Login</h2>
+    <p class="subtitle">DGR WATER SUPPLY BOARD</p>
+    <form id="adminForm">
+      <label for="adminId">User ID</label>
+      <input id="adminId" required />
+      <label for="adminPw">Password</label>
+      <input id="adminPw" type="password" required />
+      <div id="error" class="error">Invalid admin credentials</div>
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <div class="back" onclick="location.href='login.html'">← Back to main login</div>
+  </div>
+
+  <script>
+    const ADMIN_ID = "admin";
+    const ADMIN_PW = "admin123";
+
+    document.getElementById("adminForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const id = document.getElementById("adminId").value.trim();
+      const pw = document.getElementById("adminPw").value.trim();
+      const error = document.getElementById("error");
+      if (id === ADMIN_ID && pw === ADMIN_PW) {
+        window.location.href = "admin.html";
+      } else {
+        error.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
