@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User 1 Dashboard - DGR WATER SUPPLY BOARD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      color: #e5e7eb;
+      padding: 1rem;
+    }
+    header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:0.8rem 1rem 1rem;
+    }
+    h1 { font-size:1.2rem; }
+    .status {
+      font-size:0.8rem;
+      padding:0.25rem 0.7rem;
+      border-radius:999px;
+      background:rgba(148,163,184,0.25);
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0.5rem 1rem 1.5rem;
+    }
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:1rem;
+      margin-top:1rem;
+    }
+    .card {
+      background:rgba(15,23,42,0.96);
+      border-radius:16px;
+      padding:1rem;
+      border:1px solid rgba(148,163,184,0.35);
+      box-shadow:0 12px 30px rgba(0,0,0,0.6);
+    }
+    .label { font-size:0.85rem; color:#9ca3af; text-transform:uppercase; letter-spacing:0.06em; }
+    .value { font-size:1.8rem; font-weight:700; margin-top:0.4rem; }
+    .unit { font-size:0.9rem; color:#9ca3af; }
+    .last-update { margin-top:0.3rem; font-size:0.75rem; color:#9ca3af; }
+    .back {
+      font-size:0.8rem;
+      color:#9ca3af;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="back" onclick="location.href='login.html'">← Back</div>
+      <h1>User 1 – Water Usage</h1>
+    </div>
+    <div id="connStatus" class="status">Connecting...</div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <div class="card">
+        <div class="label">Litres Consumed</div>
+        <div class="value" id="litresValue">--</div>
+        <div class="unit">L</div>
+        <div class="last-update" id="litresUpdate">Last update: --</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Bill</div>
+        <div class="value" id="billValue">--</div>
+        <div class="unit">₹</div>
+        <div class="last-update" id="billUpdate">Last update: --</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Turbidity</div>
+        <div class="value" id="turbValue">--</div>
+        <div class="unit">NTU</div>
+        <div class="last-update" id="turbUpdate">Last update: --</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ===== EDIT THIS URL TO YOUR PUBLIC ESP32 / BACKEND ENDPOINT =====
+    const API_BASE_URL = "https://your-esp32-or-backend-url.com";
+    const USER_ID = "user1"; // This page is for user1
+    // =================================================================
+
+    const connStatus = document.getElementById("connStatus");
+
+    function setUpdated(id) {
+      const el = document.getElementById(id);
+      const now = new Date();
+      el.textContent = "Last update: " + now.toLocaleTimeString();
+    }
+
+    async function fetchData() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/user/${USER_ID}/status`);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        // Expect JSON:
+        // { "litres": 120.5, "bill": 45.7, "turbidity": 1.2 }
+
+        document.getElementById("litresValue").textContent =
+          (data.litres ?? 0).toFixed(1);
+        document.getElementById("billValue").textContent =
+          (data.bill ?? 0).toFixed(2);
+        document.getElementById("turbValue").textContent =
+          (data.turbidity ?? 0).toFixed(2);
+
+        setUpdated("litresUpdate");
+        setUpdated("billUpdate");
+        setUpdated("turbUpdate");
+
+        connStatus.textContent = "Online";
+        connStatus.style.background = "rgba(34,197,94,0.3)";
+      } catch (e) {
+        console.error(e);
+        connStatus.textContent = "Offline";
+        connStatus.style.background = "rgba(239,68,68,0.35)";
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 5000);
+  </script>
+</body>
+</html>
