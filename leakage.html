@@ -22,35 +22,52 @@
       font-size:0.8rem; padding:0.25rem 0.7rem;
       border-radius:999px; background:rgba(148,163,184,0.25);
     }
-    main { max-width:1000px; margin:0 auto; padding:0.5rem 1rem 1.5rem; }
-    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+
+    main { max-width:800px; margin:0 auto; }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+      margin-top:1rem;
+    }
     th, td {
-      padding:0.6rem 0.5rem;
+      padding:0.8rem;
       border-bottom:1px solid rgba(55,65,81,0.9);
-      font-size:0.9rem;
+      font-size:0.95rem;
       text-align:left;
     }
-    th { text-transform:uppercase; letter-spacing:0.06em; font-size:0.75rem; color:#9ca3af; }
+    th {
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+      font-size:0.75rem;
+      color:#9ca3af;
+    }
+
     .indicator {
-      width:20px; height:20px; border-radius:4px;
-      background:#22c55e; border:1px solid #4b5563;
+      width:25px;
+      height:25px;
+      border-radius:4px;
+      background:#22c55e;
+      border:1px solid #4b5563;
     }
     .indicator.leak { background:#ef4444; }
+
     .loss-box {
-      padding:0.3rem 0.6rem;
+      padding:0.35rem 0.7rem;
       border-radius:8px;
       background:#020617;
       border:1px solid #4b5563;
-      font-size:0.85rem;
+      font-size:0.9rem;
       width:100px;
       text-align:center;
     }
   </style>
 </head>
 <body>
+
   <header>
     <div>
-      <div class="back" onclick="location.href='admin.html'">← Back to admin</div>
+      <div class="back" onclick="location.href='admin.html'">← Back</div>
       <h1>Leakage Monitoring</h1>
     </div>
     <div id="connStatus" class="status-pill">Connecting...</div>
@@ -60,22 +77,20 @@
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Coordinate</th>
-          <th>Leak Status</th>
+          <th>ID</th>
+          <th>Coordinates</th>
+          <th>Status</th>
           <th>Loss (L)</th>
         </tr>
       </thead>
       <tbody id="leakTableBody">
-        <!-- Filled by JS -->
+        <!-- Updated dynamically -->
       </tbody>
     </table>
   </main>
 
   <script>
-    // ===== EDIT THIS URL TO YOUR BACKEND / ESP32 GATEWAY =====
-    const API_BASE_URL = "https://your-esp32-or-backend-url.com";
-    // ========================================================
+    const API_BASE_URL = "http://change-to-your-esp32-url";
 
     const connStatus = document.getElementById("connStatus");
     const tbody = document.getElementById("leakTableBody");
@@ -83,49 +98,37 @@
     async function loadLeakage() {
       try {
         const res = await fetch(`${API_BASE_URL}/leakage/status`);
-        if (!res.ok) throw new Error("HTTP " + res.status);
+        if (!res.ok) throw new Error();
+
         const data = await res.json();
-        // Expect: { points: [ { id, coords, leak, loss_litres }, ... ] }
 
         tbody.innerHTML = "";
-        (data.points || []).forEach((pt, idx) => {
+
+        data.points.forEach(pt => {
           const tr = document.createElement("tr");
 
-          const tdIndex = document.createElement("td");
-          tdIndex.textContent = pt.id || (idx + 1);
-          tr.appendChild(tdIndex);
-
-          const tdCoord = document.createElement("td");
-          tdCoord.textContent = pt.coords || "";
-          tr.appendChild(tdCoord);
-
-          const tdIndicator = document.createElement("td");
-          const ind = document.createElement("div");
-          ind.className = "indicator" + (pt.leak ? " leak" : "");
-          tdIndicator.appendChild(ind);
-          tr.appendChild(tdIndicator);
-
-          const tdLoss = document.createElement("td");
-          const lossBox = document.createElement("div");
-          lossBox.className = "loss-box";
-          lossBox.textContent = (pt.loss_litres ?? 0).toFixed(1);
-          tdLoss.appendChild(lossBox);
-          tr.appendChild(tdLoss);
+          tr.innerHTML = `
+            <td>${pt.id}</td>
+            <td>${pt.coords}</td>
+            <td><div class="indicator ${pt.leak ? 'leak' : ''}"></div></td>
+            <td><div class="loss-box">${pt.loss_litres.toFixed(1)}</div></td>
+          `;
 
           tbody.appendChild(tr);
         });
 
         connStatus.textContent = "Online";
         connStatus.style.background = "rgba(34,197,94,0.3)";
-      } catch (e) {
-        console.error(e);
+      } catch {
         connStatus.textContent = "Offline";
         connStatus.style.background = "rgba(239,68,68,0.35)";
       }
     }
 
+    // POLL EVERY 1 SECOND
+    setInterval(loadLeakage, 1000);
     loadLeakage();
-    setInterval(loadLeakage, 5000);
   </script>
+
 </body>
 </html>
