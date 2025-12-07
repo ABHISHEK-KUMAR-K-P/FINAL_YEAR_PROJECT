@@ -2,76 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DGR WATER SUPPLY BOARD - Login</title>
+  <title>DGR WATER SUPPLY BOARD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, sans-serif;
+    }
+
     body {
       min-height: 100vh;
-      background: radial-gradient(circle at top, #1e3a8a, #020617);
-      color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-    .container {
-      max-width: 700px;
       width: 100%;
-      background: rgba(15, 23, 42, 0.94);
-      border-radius: 18px;
-      padding: 2rem;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-      border: 1px solid rgba(148,163,184,0.3);
+      background: url('water.jpg') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
     }
-    h1 {
+
+    /* Dark overlay to make text readable */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
       text-align: center;
-      font-size: 1.6rem;
-      letter-spacing: 0.06em;
-      margin-bottom: 1.5rem;
-      text-transform: uppercase;
-      color: #f9fafb;
     }
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
+
+    h1 {
+      font-size: 2rem;
+      color: #ffffff;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
+
+    .button-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
     .btn {
-      padding: 1rem 1.2rem;
+      padding: 0.9rem 2rem;
       border-radius: 999px;
       border: none;
-      cursor: pointer;
       font-size: 1rem;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      box-shadow: 0 14px 30px rgba(37,99,235,0.45);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s;
+      cursor: pointer;
+      transition: 0.2s ease-in-out;
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
     }
-    .btn-admin { background: linear-gradient(135deg,#f97316,#ea580c); color: #fff; }
-    .btn-user  { background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; }
+
+    .btn-admin {
+      background: linear-gradient(135deg, #ea580c, #f97316);
+    }
+
+    .btn-user {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+    }
+
     .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 18px 36px rgba(37,99,235,0.55);
-      opacity: 0.96;
+      transform: translateY(-3px);
+      opacity: 0.95;
     }
-    p.subtitle {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #9ca3af;
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.6rem; }
+      .btn { width: 100%; }
+      .button-row { flex-direction: column; width: 100%; }
     }
   </style>
 </head>
+
 <body>
+
   <div class="container">
     <h1>DGR WATER SUPPLY BOARD</h1>
-    <p class="subtitle">Select login type</p>
-    <div class="buttons">
-      <button class="btn btn-admin" onclick="location.href='adminlogin.html'">Admin Login</button>
-      <button class="btn btn-user" onclick="location.href='userlogin.html'">User Login</button>
+
+    <div class="button-row">
+      <button class="btn btn-admin" onclick="location.href='adminlogin.html'">
+        Admin Login
+      </button>
+
+      <button class="btn btn-user" onclick="location.href='userlogin.html'">
+        User Login
+      </button>
     </div>
   </div>
+
 </body>
 </html>
