@@ -51,7 +51,7 @@
 
     .reset-btn {
       margin-top:1.5rem;
-      background:#dc2626;
+      background:#2563eb;
       color:white;
       padding:0.8rem 1.2rem;
       font-size:1rem;
@@ -108,7 +108,10 @@
 
   </div>
 
-  <button class="reset-btn" onclick="resetUser()">RESET</button>
+  <!-- VIEW LOGS BUTTON (REPLACED RESET) -->
+  <button class="reset-btn" onclick="location.href='logs.html'">
+    VIEW LOGS
+  </button>
 </main>
 
 <script>
@@ -139,13 +142,6 @@
       document.getElementById("connStatus").textContent = "Offline";
       document.getElementById("connStatus").style.background = "rgba(239,68,68,0.35)";
     }
-  }
-
-  async function resetUser() {
-    if (!confirm("Are you sure you want to reset?")) return;
-
-    await fetch(`${API_BASE_URL}/reset/user1`, { method: "POST" });
-    alert("Reset command sent!");
   }
 
   setInterval(fetchData, 1000);
