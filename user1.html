@@ -52,6 +52,23 @@
       font-size:0.8rem; padding:0.25rem 0.7rem;
       border-radius:999px; background:rgba(148,163,184,0.25);
     }
+
+    /* SAME BUTTON STYLE AS ADMIN */
+    .reset-btn {
+      margin-top:1.5rem;
+      background:#2563eb;
+      color:white;
+      padding:0.8rem 1.2rem;
+      font-size:1rem;
+      font-weight:600;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      width:100%;
+      box-shadow:0 12px 30px rgba(0,0,0,0.5);
+      transition:0.2s;
+    }
+    .reset-btn:hover { opacity:0.9; transform:translateY(-2px); }
   </style>
 </head>
 
@@ -90,6 +107,11 @@
     </div>
 
   </div>
+
+  <!-- VIEW LOGS BUTTON -->
+  <button class="reset-btn" onclick="location.href='logs.html'">
+    VIEW LOGS
+  </button>
 </main>
 
 <script>
