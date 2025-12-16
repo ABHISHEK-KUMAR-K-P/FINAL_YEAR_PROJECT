@@ -1,61 +1,205 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Monthly Usage Logs</title>
+  <meta charset="UTF-8" />
+  <title>Monthly Logs - DGR WATER SUPPLY BOARD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      color: #e5e7eb;
+      padding: 1rem;
+    }
+
+    header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:0.8rem 1rem 1rem;
+    }
+
+    h1 { font-size:1.2rem; }
+
+    .back {
+      font-size:0.8rem;
+      color:#9ca3af;
+      cursor:pointer;
+    }
+
+    main {
+      max-width:1100px;
+      margin:0 auto;
+      padding:1rem;
+    }
+
+    .card {
+      background:rgba(15,23,42,0.96);
+      border-radius:16px;
+      padding:1rem;
+      border:1px solid rgba(148,163,184,0.35);
+      box-shadow:0 12px 30px rgba(0,0,0,0.6);
+      margin-bottom:1.5rem;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th, td {
+      padding:0.7rem;
+      text-align:center;
+      border-bottom:1px solid rgba(148,163,184,0.2);
+      font-size:0.9rem;
+    }
+
+    th {
+      color:#9ca3af;
+      font-size:0.8rem;
+      text-transform:uppercase;
+    }
+
+    canvas {
+      width:100% !important;
+      max-height:320px;
+      margin-top:1rem;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:1.5rem;
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns:1fr 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>Monthly Water Usage Logs</h2>
+<header>
+  <div>
+    <div class="back" onclick="history.back()">← Back</div>
+    <h1>Monthly Usage Logs</h1>
+  </div>
+</header>
 
-<table border="1">
-  <thead>
-    <tr>
-      <th>Month</th>
-      <th>Year</th>
-      <th>Litres</th>
-      <th>Bill (₹)</th>
-    </tr>
-  </thead>
-  <tbody id="logTable"></tbody>
-</table>
+<main>
 
-<canvas id="litreChart"></canvas>
-<canvas id="billChart"></canvas>
+  <!-- TABLE CARD -->
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Year</th>
+          <th>Litres (L)</th>
+          <th>Bill (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="logTable"></tbody>
+    </table>
+  </div>
+
+  <!-- GRAPHS -->
+  <div class="grid">
+
+    <div class="card">
+      <h3>Monthly Water Consumption</h3>
+      <canvas id="litreChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h3>Monthly Bill</h3>
+      <canvas id="billChart"></canvas>
+    </div>
+
+  </div>
+
+</main>
 
 <script>
-fetch("https://final-year-project-backend-qvrf.onrender.com/logs")
-  .then(res => res.json())
-  .then(data => {
-    const table = document.getElementById("logTable");
+  const API_BASE = "https://final-year-project-backend-qvrf.onrender.com";
 
-    let labels = [];
-    let litres = [];
-    let bills = [];
+  fetch(`${API_BASE}/logs`)
+    .then(res => res.json())
+    .then(data => {
 
-    data.forEach(log => {
-      table.innerHTML += `
-        <tr>
-          <td>${log.month}</td>
-          <td>${log.year}</td>
-          <td>${log.litres}</td>
-          <td>${log.bill}</td>
-        </tr>`;
-      labels.push(`${log.month}/${log.year}`);
-      litres.push(log.litres);
-      bills.push(log.bill);
+      const table = document.getElementById("logTable");
+
+      const labels = [];
+      const litresData = [];
+      const billData = [];
+
+      data.forEach(log => {
+        table.innerHTML += `
+          <tr>
+            <td>${log.month}</td>
+            <td>${log.year}</td>
+            <td>${log.litres.toFixed(1)}</td>
+            <td>${log.bill.toFixed(2)}</td>
+          </tr>
+        `;
+
+        labels.push(`${log.month}/${log.year}`);
+        litresData.push(log.litres);
+        billData.push(log.bill);
+      });
+
+      new Chart(document.getElementById("litreChart"), {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Litres Consumed",
+            data: litresData,
+            backgroundColor: "rgba(59,130,246,0.7)"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "#e5e7eb" } } },
+          scales: {
+            x: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } },
+            y: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("billChart"), {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "Bill (₹)",
+            data: billData,
+            borderColor: "rgba(34,197,94,0.8)",
+            backgroundColor: "rgba(34,197,94,0.3)",
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "#e5e7eb" } } },
+          scales: {
+            x: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } },
+            y: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } }
+          }
+        }
+      });
+
     });
-
-    new Chart(document.getElementById("litreChart"), {
-      type: "bar",
-      data: { labels, datasets: [{ label: "Litres", data: litres }] }
-    });
-
-    new Chart(document.getElementById("billChart"), {
-      type: "line",
-      data: { labels, datasets: [{ label: "Bill", data: bills }] }
-    });
-  });
 </script>
 
 </body>
