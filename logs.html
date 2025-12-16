@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Monthly Usage Logs</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h2>Monthly Water Usage Logs</h2>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Month</th>
+      <th>Year</th>
+      <th>Litres</th>
+      <th>Bill (₹)</th>
+    </tr>
+  </thead>
+  <tbody id="logTable"></tbody>
+</table>
+
+<canvas id="litreChart"></canvas>
+<canvas id="billChart"></canvas>
+
+<script>
+fetch("https://final-year-project-backend-qvrf.onrender.com/logs")
+  .then(res => res.json())
+  .then(data => {
+    const table = document.getElementById("logTable");
+
+    let labels = [];
+    let litres = [];
+    let bills = [];
+
+    data.forEach(log => {
+      table.innerHTML += `
+        <tr>
+          <td>${log.month}</td>
+          <td>${log.year}</td>
+          <td>${log.litres}</td>
+          <td>${log.bill}</td>
+        </tr>`;
+      labels.push(`${log.month}/${log.year}`);
+      litres.push(log.litres);
+      bills.push(log.bill);
+    });
+
+    new Chart(document.getElementById("litreChart"), {
+      type: "bar",
+      data: { labels, datasets: [{ label: "Litres", data: litres }] }
+    });
+
+    new Chart(document.getElementById("billChart"), {
+      type: "line",
+      data: { labels, datasets: [{ label: "Bill", data: bills }] }
+    });
+  });
+</script>
+
+</body>
+</html>
