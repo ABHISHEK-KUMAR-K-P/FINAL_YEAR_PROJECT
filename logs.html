@@ -131,75 +131,105 @@
 <script>
   const API_BASE = "https://final-year-project-backend-qvrf.onrender.com";
 
-  fetch(`${API_BASE}/logs`)
-    .then(res => res.json())
-    .then(data => {
+  let litreChart = null;
+  let billChart = null;
 
-      const table = document.getElementById("logTable");
+  function fetchLogs() {
+    fetch(`${API_BASE}/logs`)
+      .then(res => res.json())
+      .then(data => {
 
-      const labels = [];
-      const litresData = [];
-      const billData = [];
+        const table = document.getElementById("logTable");
+        table.innerHTML = "";
 
-      data.forEach(log => {
-        table.innerHTML += `
-          <tr>
-            <td>${log.month}</td>
-            <td>${log.year}</td>
-            <td>${log.litres.toFixed(1)}</td>
-            <td>${log.bill.toFixed(2)}</td>
-          </tr>
-        `;
+        const labels = [];
+        const litresData = [];
+        const billData = [];
 
-        labels.push(`${log.month}/${log.year}`);
-        litresData.push(log.litres);
-        billData.push(log.bill);
-      });
+        data.forEach(log => {
+          table.innerHTML += `
+            <tr>
+              <td>${log.month}</td>
+              <td>${log.year}</td>
+              <td>${log.litres.toFixed(1)}</td>
+              <td>${log.bill.toFixed(2)}</td>
+            </tr>
+          `;
 
-      new Chart(document.getElementById("litreChart"), {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [{
-            label: "Litres Consumed",
-            data: litresData,
-            backgroundColor: "rgba(59,130,246,0.7)"
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { labels: { color: "#e5e7eb" } } },
-          scales: {
-            x: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } },
-            y: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } }
+          labels.push(`${log.month}/${log.year}`);
+          litresData.push(log.litres);
+          billData.push(log.bill);
+        });
+
+        /* ===== LITRES BAR GRAPH ===== */
+        if (litreChart) litreChart.destroy();
+        litreChart = new Chart(document.getElementById("litreChart"), {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [{
+              label: "Litres Consumed",
+              data: litresData,
+              backgroundColor: "rgba(59,130,246,0.7)"
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { labels: { color: "#e5e7eb" } }
+            },
+            scales: {
+              x: {
+                ticks: { color: "#9ca3af" },
+                grid: { color: "#1e293b" }
+              },
+              y: {
+                min: 0,                 // 🔥 ensures zero bars are visible
+                max: 1,                 // 🔥 keeps baseline visible during testing
+                ticks: { color: "#9ca3af" },
+                grid: { color: "#1e293b" }
+              }
+            }
           }
-        }
-      });
+        });
 
-      new Chart(document.getElementById("billChart"), {
-        type: "line",
-        data: {
-          labels,
-          datasets: [{
-            label: "Bill (₹)",
-            data: billData,
-            borderColor: "rgba(34,197,94,0.8)",
-            backgroundColor: "rgba(34,197,94,0.3)",
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { labels: { color: "#e5e7eb" } } },
-          scales: {
-            x: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } },
-            y: { ticks: { color: "#9ca3af" }, grid: { color: "#1e293b" } }
+        /* ===== BILL BAR GRAPH ===== */
+        if (billChart) billChart.destroy();
+        billChart = new Chart(document.getElementById("billChart"), {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [{
+              label: "Bill (₹)",
+              data: billData,
+              backgroundColor: "rgba(34,197,94,0.7)"
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { labels: { color: "#e5e7eb" } }
+            },
+            scales: {
+              x: {
+                ticks: { color: "#9ca3af" },
+                grid: { color: "#1e293b" }
+              },
+              y: {
+                min: 0,
+                ticks: { color: "#9ca3af" },
+                grid: { color: "#1e293b" }
+              }
+            }
           }
-        }
-      });
+        });
 
-    });
+      });
+  }
+
+  // Initial load + auto refresh (NO PAGE RELOAD)
+  fetchLogs();
+  setInterval(fetchLogs, 10000);
 </script>
 
 </body>
